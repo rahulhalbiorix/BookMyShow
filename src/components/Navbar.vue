@@ -1,42 +1,47 @@
 <template>
-  <nav class="navbar">
+  <nav class="flex items-center justify-between bg-gray-900 text-white px-6 h-16 shadow-md">
     <!-- Left: Logo -->
-    <div class="logo">
-      <h1>BookMyShow</h1>
-    </div>
+    <div class="text-2xl font-bold cursor-pointer">BookMyShow</div>
 
     <!-- Middle: Search Bar -->
-    <div class="searchBar">
-      <input type="text" placeholder="Search movies..." class="searchInput" />
+    <div class="flex-1 flex justify-center px-4">
+      <input
+        type="text"
+        placeholder="Search movies..."
+        class="w-1/2 px-4 py-2 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+      />
     </div>
 
     <!-- Right: Buttons -->
-    <div class="actionBtn">
+    <div class="flex items-center gap-4 relative">
       <!-- Sign In Button -->
-      <button class="signinBtn">Sign In</button>
+      <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm">
+        Sign In
+      </button>
 
-      <!-- User Profile Icon -->
-      <div class="flex items-center m-2">
-        <div class="userProfile">
-          <i class="pi pi-user"> </i>
+      <!-- User Profile -->
+      <div class="flex items-center space-x-1 cursor-pointer">
+        <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
+          <i class="pi pi-user text-lg"></i>
         </div>
-        <div style="margin-left: 2px">
-          <span>rahul</span>
-        </div>
+        <span>rahul</span>
       </div>
 
       <!-- Dropdown Menu -->
-      <div class="dropdownWrapper">
-        <button class="dropdownBtn" @click="toggleDropdown">
+      <div class="relative">
+        <button class="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded-md" @click="toggleDropdown">
           <i class="pi pi-bars"></i>
         </button>
 
-        <div v-if="showDropdown" class="dropdownMenu">
-          <ul>
-            <li>Home</li>
-            <li>Movies</li>
-            <li>Bookings</li>
-            <li>Logout</li>
+        <div
+          v-if="showDropdown"
+          class="absolute right-0 top-12 w-40 bg-white text-black rounded-md shadow-lg z-1"
+        >
+          <ul class="py-2">
+            <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Home</li>
+            <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Movies</li>
+            <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bookings</li>
+            <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Logout</li>
           </ul>
         </div>
       </div>
@@ -44,7 +49,7 @@
   </nav>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 
 const showDropdown = ref(false)
@@ -53,130 +58,3 @@ const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value
 }
 </script>
-
-<style scoped>
-/* Navbar wrapper */
-.navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #1f2937; /* dark gray */
-  color: white;
-  padding: 0 24px;
-  height: 64px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-/* Logo */
-.logo h1 {
-  font-size: 24px;
-  font-weight: bold;
-  cursor: pointer;
-  margin: 0;
-}
-
-/* Search bar */
-.searchBar {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  padding: 0 16px;
-}
-
-.searchInput {
-  width: 50%;
-  padding: 10px;
-  border-radius: 6px;
-  border: none;
-  outline: none;
-  background: #2d3748;
-  color: white;
-}
-
-.searchInput:focus {
-  border: 2px solid #ef4444; /* red border on focus */
-}
-
-/* Action buttons */
-.actionBtn {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  position: relative;
-}
-
-/* Sign in button */
-.signinBtn {
-  background: #ef4444;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  color: white;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.signinBtn:hover {
-  background: #dc2626;
-}
-
-/* User Profile */
-.userProfile {
-  width: 40px;
-  height: 40px;
-  background: #374151;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.userProfile i {
-  font-size: 18px;
-}
-
-/* Dropdown */
-.dropdownWrapper {
-  position: relative;
-}
-
-.dropdownBtn {
-  background: #374151;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  color: white;
-  cursor: pointer;
-}
-
-.dropdownBtn:hover {
-  background: #4b5563;
-}
-
-.dropdownMenu {
-  position: absolute;
-  right: 0;
-  top: 45px;
-  width: 160px;
-  background: white;
-  color: black;
-  border-radius: 6px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.dropdownMenu ul {
-  list-style: none;
-  padding: 8px 0;
-  margin: 0;
-}
-
-.dropdownMenu li {
-  padding: 10px 16px;
-  cursor: pointer;
-}
-
-.dropdownMenu li:hover {
-  background: #f3f4f6;
-}
-</style>

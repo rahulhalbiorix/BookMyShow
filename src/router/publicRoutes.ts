@@ -6,6 +6,11 @@ const publicRoutes: RouteRecordRaw[] = [
     name: 'MovieList',
     component: () => import('@/views/MovieList.vue'),
   },
+  {
+    path: '/movies/:id',
+    name: 'MovieDetails',
+    component: () => import('@/views/MovieOverView.vue'),
+  },
   //   {
   //     path: '/login',
   //     name: 'Login',
@@ -15,11 +20,6 @@ const publicRoutes: RouteRecordRaw[] = [
   //     path: '/register',
   //     name: 'Register',
   //     component: () => import('@/views/Register.vue'),
-  //   },
-  //   {
-  //     path: '/movies/:id',
-  //     name: 'MovieDetails',
-  //     component: () => import('@/views/MovieDetails.vue'),
   //   },
 ]
 

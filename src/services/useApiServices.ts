@@ -52,6 +52,8 @@ export const activateDeactivateTheater = (ownerId: string) =>
 export const fetchMovieList = (limit: number, page: number, language: string, category: string) =>
   instance.get('/movies/list', { params: { limit, page, language, category } })
 
+export const fetchSingleMovie = (id: string) => instance.get(`/movies/${id}`)
+
 // ╔════════════════════════════╗
 // ║  🟣 Shows API
 // ╚════════════════════════════╝
