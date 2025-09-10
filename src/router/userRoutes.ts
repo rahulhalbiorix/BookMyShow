@@ -6,6 +6,16 @@ const userRoutes: RouteRecordRaw[] = [
     // component: () => import('@/layouts/UserLayout.vue'),
     meta: { requiresAuth: true, role: 'user' },
     children: [
+      //       {
+      //   path: '/',
+      //   name: 'MovieList',
+      //   component: () => import('@/views/SubAdminList/SubAdminList.vue'),
+      // },
+      // {
+      //   path: '/movies/:id',
+      //   name: 'MovieDetails',
+      //   component: () => import('@/views/MovieOverView.vue'),
+      // },
       //   {
       //     path: 'dashboard',
       //     name: 'UserDashboard',

@@ -19,6 +19,7 @@
     "@tailwindcss/vite": "^4.1.13",
     "axios": "^1.11.0",
     "pinia": "^3.0.3",
+    "pinia-plugin-persistedstate": "^4.5.0",
     "primeicons": "^7.0.0",
     "primevue": "^4.3.9",
     "tailwindcss": "^4.1.13",

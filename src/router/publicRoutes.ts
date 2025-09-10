@@ -3,24 +3,23 @@ import type { RouteRecordRaw } from 'vue-router'
 const publicRoutes: RouteRecordRaw[] = [
   {
     path: '/',
-    name: 'MovieList',
-    component: () => import('@/views/MovieList.vue'),
+    redirect: '/login',
   },
   {
-    path: '/movies/:id',
-    name: 'MovieDetails',
-    component: () => import('@/views/MovieOverView.vue'),
+    path: '/login',
+    name: 'Login',
+    component: () => import('@/views/Authentication/Login.vue'),
   },
-  //   {
-  //     path: '/login',
-  //     name: 'Login',
-  //     component: () => import('@/views/Login.vue'),
-  //   },
-  //   {
-  //     path: '/register',
-  //     name: 'Register',
-  //     component: () => import('@/views/Register.vue'),
-  //   },
+  {
+    path: '/signup-user',
+    name: 'SignUpUser',
+    component: () => import('@/views/Authentication/SignUpUser.vue'),
+  },
+  {
+    path: '/setPassword',
+    name: 'SetPassword',
+    component: () => import('@/views/Authentication/SetPassword.vue'),
+  },
 ]
 
 export default publicRoutes

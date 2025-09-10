@@ -1,18 +1,15 @@
-import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory, useRoute, type RouteRecordRaw } from 'vue-router'
 
 import publicRoutes from './publicRoutes'
 import userRoutes from './userRoutes'
-import adminRoutes from './adminRoutes'
+import SubadminRoutes from './SubAdminRoutes'
+import SuperAdminRoutes from './SuperAdminRoutes'
 
 const routes: RouteRecordRaw[] = [
   ...publicRoutes,
   ...userRoutes,
-  ...adminRoutes,
-  // {
-  // path: '/:catchAll',
-  // name: 'NotFound',
-  // component: () => import('@/views/NotFound.vue'),
-  // },
+  ...SubadminRoutes,
+  ...SuperAdminRoutes,
 ]
 
 const router = createRouter({

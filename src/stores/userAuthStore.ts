@@ -1,18 +1,30 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
-export const userAuthStore = defineStore('authstore', () => {
-  const token = ref('')
+export const userAuthStore = defineStore(
+  'authstore',
+  () => {
+    const token = ref('')
 
-  const userRole = ref('')
+    const userRole = ref('')
 
-  function setToken(payload: string) {
-    token.value = payload
-  }
+    const userName = ref('')
 
-  function setUserRole(payload: string) {
-    userRole.value = payload
-  }
+    function setToken(payload: string) {
+      token.value = payload
+    }
 
-  return { token, setToken, userRole, setUserRole }
-})
+    function setUserRole(payload: string) {
+      userRole.value = payload
+    }
+
+    function setUserName(payload: string) {
+      userName.value = payload
+    }
+
+    return { token, setToken, userRole, setUserRole, userName, setUserName }
+  },
+  {
+    persist: true,
+  },
+)
