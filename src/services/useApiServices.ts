@@ -37,6 +37,9 @@ export const activateDeactivateTheater = (ownerId: string) =>
 // ║ 🟡 Theateres API
 // ╚════════════════════════════╝
 
+export const fetchTheoterList = (ownerId: string, isActive: boolean | '', limit = 10, page = 1) =>
+  instance.get('/theaters', { params: { ownerId, isActive, limit, page } })
+
 // ╔════════════════════════════╗
 // ║ 🟢 Cities API
 // ╚════════════════════════════╝

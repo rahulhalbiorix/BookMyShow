@@ -1,44 +1,87 @@
 <template>
-  <div class="flex h-screen">
+  <div class="flex w-full">
     <!-- Sidebar -->
-    <aside class="w-64 bg-gray-900 text-white flex flex-col p-6">
+    <aside
+      :class="[
+        collapsed ? 'w-16' : 'w-64',
+        'bg-gray-900 text-white flex flex-col p-6 fixed h-full top-0 left-0 transition-all duration-300',
+      ]"
+    >
+      <button @click="collapsed = !collapsed" class="mb-6 text-gray-400 hover:text-white">
+        <i :class="collapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'"></i>
+      </button>
+
       <!-- User Info -->
-      <div class="flex flex-col items-center mb-10">
+      <div
+        v-if="!collapsed"
+        class="flex flex-col items-center mb-10 p-4 rounded-lg bg-gray-800 shadow-md transition-all duration-300"
+      >
         <div
-          class="w-16 h-16 rounded-full bg-gray-700 flex items-center justify-center text-2xl font-bold"
+          class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-2xl font-bold text-white shadow"
         >
-          Sub -Admin Side
+          {{ store.userName[0].toUpperCase() }}
         </div>
-        <h2 class="mt-3 text-lg font-semibold">Sub -Admin Side</h2>
-        <p class="text-sm text-gray-400">Sub -Admin Side</p>
+        <h2 class="mt-3 text-lg font-semibold">{{ store.userName }}</h2>
+        <p class="text-sm text-gray-400 capitalize">{{ store.userRole }}</p>
       </div>
 
       <!-- Navigation Links -->
       <nav class="flex-1">
         <ul class="space-y-3">
-          <li v-for="(link, index) in navLinks" :key="index">
-            <a :href="link.href" class="block px-4 py-2 rounded-lg hover:bg-gray-700 transition">
-              {{ link.label }}
-            </a>
+          <li>
+            <router-link
+              :to="{ name: 'TheoterList' }"
+              :class="[
+                collapsed ? 'justify-center' : 'justify-start',
+                'flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-800 transition',
+              ]"
+              active-class="bg-gray-800 text-blue-400 font-semibold"
+            >
+              <i class="pi pi-home"></i>
+              <span v-if="!collapsed">Theoter</span>
+            </router-link>
+          </li>
+
+          <li>
+            <button
+              :class="[
+                collapsed ? 'justify-center' : 'justify-start',
+                'flex items-center gap-3 px-3 py-2 rounded bg-red-600 hover:bg-red-700 transition w-full text-left',
+              ]"
+            >
+              <i class="pi pi-sign-out"></i>
+              <span v-if="!collapsed">Logout</span>
+            </button>
           </li>
         </ul>
       </nav>
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 bg-gray-100 p-6">
-      <h1 class="text-2xl font-bold">Main Content Area</h1>
+    <main
+      :class="[
+        collapsed ? 'ml-16' : 'ml-64',
+        'flex-1 bg-gray-100 px-6 transition-all duration-300',
+      ]"
+    >
       <router-view></router-view>
     </main>
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref } from 'vue'
+import { userAuthStore } from '@/stores/userAuthStore'
+const collapsed = ref(false)
 
-const navLinks = ref([
-  { label: 'Dashboard', href: '#' },
-
-  { label: 'Logout', href: '#' },
-])
+const store = userAuthStore()
 </script>
+
+<style scoped>
+.hover\:bg-gray-800:hover {
+  background-color: #1f2937;
+}
+.transition {
+  transition: all 0.2s ease-in-out;
+}
+</style>

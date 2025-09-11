@@ -35,6 +35,7 @@
 import { Button, InputText } from 'primevue'
 import { registerSubAdmin } from '@/services/useApiServices'
 import { ref } from 'vue'
+import router from '@/router'
 
 const email = ref('')
 const name = ref('')
@@ -53,6 +54,9 @@ const handleRegister = async () => {
     const res = await registerSubAdmin(payload)
     if (res.data.success) {
       alert('Sub Admin registered successfully!')
+
+      router.push({ name: 'SuperAdminDashboard' })
+
       email.value = ''
       name.value = ''
       mobile.value = ''

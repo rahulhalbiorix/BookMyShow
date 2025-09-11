@@ -57,7 +57,8 @@ const handleLogin = async () => {
       store.setUserRole(res.data.data.role)
       store.setToken(res.data.data.token)
       store.setUserName(res.data.data.name)
-      router.push({ name: 'SuperAdmin' })
+      store.setOwnerId(res.data.data._id)
+      router.push({ name: 'SubAdmin' })
     }
   } catch (error) {
     console.log(error)

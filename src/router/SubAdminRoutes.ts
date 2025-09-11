@@ -6,7 +6,14 @@ const SubadminRoutes: RouteRecordRaw[] = [
     name: 'SubAdmin',
     component: () => import('@/components/SubNavbar.vue'),
     meta: { requiresAuth: true, role: 'Subadmin' },
-    children: [],
+    redirect: '/subadmin/theoter-list',
+    children: [
+      {
+        path: 'theoter-list',
+        name: 'TheoterList',
+        component: () => import('@/views/Theoter/Theoter.vue'),
+      },
+    ],
   },
 ]
 

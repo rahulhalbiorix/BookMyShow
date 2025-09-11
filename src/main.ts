@@ -9,6 +9,8 @@ import router from './router'
 import Aura from '@primeuix/themes/aura'
 import 'primeicons/primeicons.css'
 import { definePreset } from '@primeuix/themes'
+import ToastService from 'primevue/toastservice'
+import ConfirmationService from 'primevue/confirmationservice'
 
 const MyPreset = definePreset(Aura, {
   semantic: {
@@ -33,10 +35,10 @@ const app = createApp(App)
 const pinia = createPinia()
 
 pinia.use(piniaPluginPersistedstate)
-
 app.use(pinia)
 app.use(router)
-
+app.use(ConfirmationService)
+app.use(ToastService)
 app.use(PrimeVue, {
   theme: {
     preset: MyPreset,

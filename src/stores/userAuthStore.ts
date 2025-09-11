@@ -5,13 +5,16 @@ export const userAuthStore = defineStore(
   'authstore',
   () => {
     const token = ref('')
-
     const userRole = ref('')
-
     const userName = ref('')
+    const OwnerId = ref('')
 
     function setToken(payload: string) {
       token.value = payload
+    }
+
+    function setOwnerId(payload: string) {
+      OwnerId.value = payload
     }
 
     function setUserRole(payload: string) {
@@ -22,7 +25,25 @@ export const userAuthStore = defineStore(
       userName.value = payload
     }
 
-    return { token, setToken, userRole, setUserRole, userName, setUserName }
+    function logOut() {
+      console.log('function log out is work....')
+      token.value = ''
+      userRole.value = ''
+      userName.value = ''
+      OwnerId.value = ''
+    }
+
+    return {
+      token,
+      setToken,
+      userRole,
+      setUserRole,
+      userName,
+      setUserName,
+      OwnerId,
+      setOwnerId,
+      logOut,
+    }
   },
   {
     persist: true,
