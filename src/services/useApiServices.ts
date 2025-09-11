@@ -38,12 +38,26 @@ export const activateDeactivateTheater = (ownerId: string) =>
 // ║ 🟡 Theateres API
 // ╚════════════════════════════╝
 
-export const fetchTheoterList = (ownerId: string, isActive: boolean | '', limit = 10, page = 1) =>
+export const fetchtheaterList = (ownerId: string, isActive: boolean | '', limit = 30, page = 1) =>
   instance.get('/theaters', { params: { ownerId, isActive, limit, page } })
+
+export const addtheater = (data: FormData) => instance.post('/theaters/add-theater', data)
+
+export const fetchtheaterdetailes = (id: string) =>
+  instance.get(`/theaters/get-detail-of-theater/${id}`)
+
+export const updatetheater = (id: string, data: FormData) =>
+  instance.patch(`/theaters/update-theater/${id}`, data)
+
+export const activateInactivatetheater = (id: string) => instance.patch(`/theaters/status/${id}`)
+
+export const deletetheater = (id: string) => instance.delete(`/theaters/delete-theater/${id}`)
 
 // ╔════════════════════════════╗
 // ║ 🟢 Cities API
 // ╚════════════════════════════╝
+
+export const fetchCities = () => instance.get('/cities/list-cities')
 
 // ╔════════════════════════════╗
 // ║ 🔵 screens  API

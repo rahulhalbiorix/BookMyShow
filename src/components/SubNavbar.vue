@@ -30,7 +30,7 @@
         <ul class="space-y-3">
           <li>
             <router-link
-              :to="{ name: 'TheoterList' }"
+              :to="{ name: 'TheaterList' }"
               :class="[
                 collapsed ? 'justify-center' : 'justify-start',
                 'flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-800 transition',
@@ -38,7 +38,7 @@
               active-class="bg-gray-800 text-blue-400 font-semibold"
             >
               <i class="pi pi-home"></i>
-              <span v-if="!collapsed">Theoter</span>
+              <span v-if="!collapsed">theater</span>
             </router-link>
           </li>
 
