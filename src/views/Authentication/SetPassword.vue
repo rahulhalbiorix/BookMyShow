@@ -35,6 +35,7 @@ import { Button, Password } from 'primevue'
 import { onMounted, ref } from 'vue'
 import { setPassword } from '@/services/useApiServices'
 import { useRoute } from 'vue-router'
+import router from '@/router'
 
 const tokenForSetPassword = ref<string>('')
 const email = ref<string>('')
@@ -65,6 +66,7 @@ const handleSetPassword = async () => {
       confirmPassword.value = ''
       tokenForSetPassword.value = ''
       email.value = ''
+      router.push({ name: 'SubAdmin' })
     } else {
       alert(res.data.message || 'Something went wrong')
     }
