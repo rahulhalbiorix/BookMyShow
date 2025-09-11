@@ -25,7 +25,8 @@ export const requestResetPassword = (data: FormData) =>
 
 export const verifyResetToken = (token: string) => instance.get(`/auth/verify-reset-token/${token}`)
 
-export const setPassword = (data: any) => instance.post('/auth/set-password', data)
+export const setPassword = (data: any) =>
+  instance.post('/auth/set-password', data, { headers: { 'Content-Type': 'application/json' } })
 
 export const fetchListOfSubAdmins = (limit = 10, page = 1) =>
   instance.get('/auth/sub-admins', { params: { page, limit } })
