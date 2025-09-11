@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-md mx-auto mt-10 bg-white shadow-lg rounded-xl p-8">
     <h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">Set Password</h2>
-
+    <h3 class="text-2xl font-semibold text-blue-300 text-center">{{ email }}</h3>
     <!-- Set Password -->
     <div class="mb-4">
       <label class="block text-sm font-medium text-gray-700 mb-1">Set Password</label>
@@ -32,12 +32,17 @@
 
 <script setup lang="ts">
 import { Button, Password } from 'primevue'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { setPassword } from '@/services/useApiServices'
+import { useRoute } from 'vue-router'
 
+const tokenForSetPassword = ref<string>('')
+const email = ref<string>('')
 const password = ref('')
 const confirmPassword = ref('')
 const loading = ref(false)
+
+const route = useRoute()
 
 const handleSetPassword = async () => {
   if (!password.value || !confirmPassword.value) {
@@ -51,13 +56,15 @@ const handleSetPassword = async () => {
 
   try {
     loading.value = true
-    const payload = { password: password.value }
+    const payload = { token: tokenForSetPassword.value, newPassword: password.value }
     const res = await setPassword(payload)
 
     if (res.data.success) {
       alert('Password set successfully!')
       password.value = ''
       confirmPassword.value = ''
+      tokenForSetPassword.value = ''
+      email.value = ''
     } else {
       alert(res.data.message || 'Something went wrong')
     }
@@ -68,4 +75,9 @@ const handleSetPassword = async () => {
     loading.value = false
   }
 }
+
+onMounted(() => {
+  tokenForSetPassword.value = (route.query.token as string) || ''
+  email.value = (route.query.email as string) || ''
+})
 </script>
