@@ -66,7 +66,7 @@ const handleSetPassword = async () => {
       confirmPassword.value = ''
       tokenForSetPassword.value = ''
       email.value = ''
-      router.push({ name: 'SubAdmin' })
+      router.push({ name: 'Login' })
     } else {
       alert(res.data.message || 'Something went wrong')
     }
