@@ -90,7 +90,7 @@
               rounded
               outlined
               class="!px-4 !py-2"
-              @click="viewTheaterDetails(theater)"
+              @click="viewTheaterDetails(theater._id)"
             />
             <Button
               label="Edit"
@@ -116,7 +116,7 @@
               rounded
               text
               class="!px-4 !py-2"
-              @click="deleteTheater(theater)"
+              @click="deleteTheater(theater._id)"
             />
           </div>
         </template>
@@ -197,7 +197,13 @@
         <!-- Actions -->
         <div class="flex justify-end gap-4 pt-4">
           <Button label="Cancel" severity="secondary" outlined @click="closeDialog" />
-          <Button label="Add Theater" icon="pi pi-plus" severity="success" type="submit" />
+          <Button
+            label="Add Theater"
+            icon="pi pi-plus"
+            severity="success"
+            type="submit"
+            :loading="loadingBtn"
+          />
         </div>
       </form>
     </Dialog>
@@ -220,7 +226,14 @@ import { useToast } from 'primevue/usetoast'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { onMounted, ref } from 'vue'
 import { userAuthStore } from '@/stores/userAuthStore'
-import { addtheater, fetchCities, fetchtheaterList, updatetheater } from '@/services/useApiServices'
+import {
+  addtheater,
+  fetchCities,
+  fetchtheaterList,
+  updatetheater,
+  deletetheater,
+  activateDeactivatetheater,
+} from '@/services/useApiServices'
 import { useConfirm } from 'primevue/useconfirm'
 import router from '@/router'
 
@@ -251,13 +264,8 @@ interface theater {
 
 const theaters = ref<theater[]>([])
 
-const viewTheaterDetails = (theater: theater) => {
-  toast.add({
-    severity: 'info',
-    summary: 'View Details',
-    detail: `Viewing ${theater.name}`,
-    life: 3000,
-  })
+const viewTheaterDetails = (id: string) => {
+  router.push({ name: 'TheaterDetailes', params: { id } })
 }
 
 const form = ref({
@@ -270,6 +278,8 @@ const form = ref({
 })
 
 const editedTheaterId = ref('')
+
+const loadingBtn = ref(false)
 
 const onImageSelect = (event: any) => {
   const file = event.files[0]
@@ -302,30 +312,68 @@ const fetchListOfCities = async () => {
   }
 }
 
-const deleteTheater = (theater: theater) => {
+//--- delete theater functionality ----
+
+const deleteTheater = (id: string) => {
   confirm.require({
-    message: `Are you sure you want to delete ${theater.name}?`,
+    message: `Are you sure you want to delete theater?`,
     header: 'Confirmation',
     icon: 'pi pi-exclamation-triangle',
-    accept: () => {
-      toast.add({
-        severity: 'warn',
-        summary: 'Deleted',
-        detail: `${theater.name} deleted`,
-        life: 3000,
-      })
+    accept: async () => {
+      try {
+        const res = await deletetheater(id)
+
+        if (res.data.success) {
+          toast.add({
+            severity: 'warn',
+            summary: 'Deleted',
+
+            detail: res.data.message,
+            life: 3000,
+          })
+          handleFetchTheaterList()
+        }
+      } catch (error) {
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to delete theater',
+          life: 3000,
+        })
+        console.error(error)
+      }
     },
   })
 }
 
-const toggleStatus = (theater: theater) => {
-  theater.isActive = !theater.isActive
-  toast.add({
-    severity: theater.isActive ? 'success' : 'error',
-    summary: 'Status Updated',
-    detail: theater.isActive ? `${theater.name} Activated` : `${theater.name} Deactivated`,
-    life: 3000,
-  })
+//--activate in deactivate theater
+
+const toggleStatus = async (theater: theater) => {
+  console.log(theater._id)
+
+  try {
+    const res = await activateDeactivatetheater(theater._id)
+
+    if (res.data.success) {
+      const isActiveNow = res.data.data.isActive
+
+      toast.add({
+        severity: isActiveNow ? 'success' : 'error',
+        summary: 'Status Updated',
+        detail: res.data.message,
+        life: 3000,
+      })
+
+      handleFetchTheaterList()
+    }
+  } catch (error) {
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to delete theater',
+      life: 3000,
+    })
+  }
 }
 
 // ----- functionality for dialog -----
@@ -336,6 +384,7 @@ const cities = ref<City[]>([])
 const handleSubmit = async () => {
   alert('dialog is work .....')
 
+  loadingBtn.value = true
   try {
     const formdata = new FormData()
 
@@ -351,7 +400,7 @@ const handleSubmit = async () => {
       const res = await updatetheater(editedTheaterId.value, formdata)
       if (res.data.success) {
         alert(res.data.message)
-        resetForm()
+
         closeDialog()
         handleFetchTheaterList()
       }
@@ -360,13 +409,15 @@ const handleSubmit = async () => {
 
       if (res.data.success) {
         alert(res.data.message)
-        resetForm()
+
         closeDialog()
         handleFetchTheaterList()
       }
     }
   } catch (error) {
     console.log(error)
+  } finally {
+    loadingBtn.value = false
   }
 }
 
@@ -383,6 +434,7 @@ const resetForm = () => {
 
 const closeDialog = () => {
   resetForm()
+  editedTheaterId.value = ''
   visible.value = false
 }
 

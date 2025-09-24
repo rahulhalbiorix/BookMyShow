@@ -38,6 +38,9 @@
               {{ lang.toUpperCase() }}
             </span>
           </div>
+          <div class="mt-3 border-2 bg-amber-200">
+            <Button label="BooK Ticket" severity="danger" @click="handleBookTicketBtn"></Button>
+          </div>
         </div>
       </div>
     </div>
@@ -109,10 +112,12 @@
 </template>
 
 <script setup lang="ts">
-import { fetchSingleMovie } from '@/services/useApiServices'
+import { fetchSingleMovie, fetchUserListShow } from '@/services/useApiServices'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import fallbackImg from '@/assets/female_profile_photo.png'
+import { Button } from 'primevue'
+import router from '@/router'
 
 export interface Movie {
   _id: string
@@ -159,6 +164,10 @@ const movieData = ref<Movie | null>(null)
 
 const route = useRoute()
 movieId.value = route.params.id as string
+
+const handleBookTicketBtn = () => {
+  router.push({ name: 'AllMovieShowList', params: { movieId: movieId.value } })
+}
 
 const fetchMovieData = async () => {
   try {

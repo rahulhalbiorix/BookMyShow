@@ -49,7 +49,7 @@ export const fetchtheaterdetailes = (id: string) =>
 export const updatetheater = (id: string, data: FormData) =>
   instance.patch(`/theaters/update-theater/${id}`, data)
 
-export const activateInactivatetheater = (id: string) => instance.patch(`/theaters/status/${id}`)
+export const activateDeactivatetheater = (id: string) => instance.patch(`/theaters/status/${id}`)
 
 export const deletetheater = (id: string) => instance.delete(`/theaters/delete-theater/${id}`)
 
@@ -62,6 +62,28 @@ export const fetchCities = () => instance.get('/cities/list-cities')
 // ╔════════════════════════════╗
 // ║ 🔵 screens  API
 // ╚════════════════════════════╝
+
+export const fetchScreenList = (
+  TheaterId: string,
+  isComplete = 'false',
+  isActive = 'false',
+  limit = 30,
+  page = 1,
+) => instance.get(`/screens/list/${TheaterId}`, { params: { isComplete, isActive, limit, page } })
+
+export const fetchScreenDetails = (id: string) => instance.get(`/screens/get-screen-details/${id}`)
+
+export const updateScreen = (id: string, data: any) =>
+  instance.put(`/screens/update-screen/${id}`, data, {
+    headers: { 'Content-Type': 'application/json' },
+  })
+
+export const deleteScreen = (id: string) => instance.delete(`/screens/delete-screen/${id}`)
+
+export const addScreen = (data: any) =>
+  instance.post(`/screens/add-screen`, data, { headers: { 'Content-Type': 'application/json' } })
+
+export const toggleScreen = (id: string) => instance.patch(`/screens/screen-status/${id}`)
 
 // ╔════════════════════════════╗
 // ║  🟠 Movies API
@@ -76,9 +98,42 @@ export const fetchSingleMovie = (id: string) => instance.get(`/movies/${id}`)
 // ║  🟣 Shows API
 // ╚════════════════════════════╝
 
+export const addShows = (data: any) =>
+  instance.post('/shows/add-show', data, { headers: { 'Content-Type': 'application/json' } })
+
+export const showList = (theaterId: string, screenId: string, movieId: string, startDate: string) =>
+  instance.get('/shows/list', { params: { theaterId, screenId, movieId, startDate } })
+
+export const showDetails = (showId: string) => instance.get(`/shows/details/${showId}`)
+
+export const updateShow = (showId: string, data: any) =>
+  instance.put(`/shows/update/${showId}`, data, { headers: { 'Content-Type': 'application/json' } })
+
+export const showStatus = (showId: string, data: any) =>
+  instance.put(`/shows/status/${showId}`, data, { headers: { 'Content-Type': 'application/json' } })
+
+export const deleteShows = (showId: string) => instance.delete(`/shows/delete/${showId}`)
+
 // ╔════════════════════════════╗
 // ║  ⚪ SeatLayout API
 // ╚════════════════════════════╝
+
+export const fetchseatLayout = (id: string) => instance.get(`/seat-layout/${id}`)
+
+export const createSeatLayout = (data: any) =>
+  instance.post('/seat-layout/create-seat-layout', data, {
+    headers: { 'Content-Type': 'application/json' },
+  })
+
+export const updateSeatLayout = (id: string, data: any) =>
+  instance.put(`/seat-layout/${id}`, data, {
+    headers: { 'Content-Type': 'application/json' },
+  })
+
+export const updateSeatAvailability = (id: string, data: any) =>
+  instance.patch(`/seat-layout/${id}/seats`, data, {
+    headers: { 'Content-Type': 'application/json' },
+  })
 
 // ╔════════════════════════════╗
 // ║  🟢 default API
@@ -87,6 +142,16 @@ export const fetchSingleMovie = (id: string) => instance.get(`/movies/${id}`)
 // ╔════════════════════════════╗
 // ║  🟤 User Dashboard API
 // ╚════════════════════════════╝
+
+export const fetchUserListShow = (
+  theaterId: string,
+  screenId: string,
+  movieId: string,
+  startDate: string,
+) =>
+  instance.get('/user-dashboard/list-shows', {
+    params: { theaterId, screenId, movieId, startDate },
+  })
 
 // ╔════════════════════════════╗
 // ║  🟠 Booking API

@@ -41,7 +41,19 @@
               <span v-if="!collapsed">theater</span>
             </router-link>
           </li>
-
+          <li>
+            <router-link
+              :to="{ name: 'ShowList' }"
+              :class="[
+                collapsed ? 'justify-center' : 'justify-start',
+                'flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-800 transition',
+              ]"
+              active-class="bg-gray-800 text-blue-400 font-semibold"
+            >
+              <i class="pi pi-video"></i>
+              <span v-if="!collapsed">Show</span>
+            </router-link>
+          </li>
           <li>
             <button
               :class="[
@@ -72,6 +84,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { userAuthStore } from '@/stores/userAuthStore'
+
 const collapsed = ref(false)
 
 const store = userAuthStore()
