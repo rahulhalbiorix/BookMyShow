@@ -5,7 +5,7 @@ const SuperAdminRoutes: RouteRecordRaw[] = [
     path: '/superAdmin',
     name: 'SuperAdmin',
     component: () => import('@/components/SuperNavbar.vue'),
-    meta: { requiresAuth: true, role: 'Super_Admin' },
+    meta: { requiresAuth: true, role: 'super_admin' },
     redirect: '/superAdmin/dashboard',
     children: [
       {

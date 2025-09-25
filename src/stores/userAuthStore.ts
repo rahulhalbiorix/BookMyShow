@@ -8,6 +8,7 @@ export const userAuthStore = defineStore(
     const userRole = ref('')
     const userName = ref('')
     const OwnerId = ref('')
+    const isUserLoggedIn = ref(false)
 
     function setToken(payload: string) {
       token.value = payload
@@ -31,6 +32,7 @@ export const userAuthStore = defineStore(
       userRole.value = ''
       userName.value = ''
       OwnerId.value = ''
+      isUserLoggedIn.value = false
     }
 
     return {
@@ -43,6 +45,7 @@ export const userAuthStore = defineStore(
       OwnerId,
       setOwnerId,
       logOut,
+      isUserLoggedIn,
     }
   },
   {

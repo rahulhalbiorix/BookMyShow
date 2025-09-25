@@ -14,15 +14,7 @@
             Movies
           </RouterLink>
         </li>
-        <li>
-          <RouterLink
-            :to="{ name: 'UserDashboard' }"
-            class="hover:text-yellow-400"
-            active-class="text-yellow-400"
-          >
-            Dashboard
-          </RouterLink>
-        </li>
+
         <li>
           <RouterLink
             :to="{ name: 'UserBookings' }"
@@ -33,13 +25,7 @@
           </RouterLink>
         </li>
         <li>
-          <RouterLink
-            :to="{ name: 'UserProfile' }"
-            class="hover:text-yellow-400"
-            active-class="text-yellow-400"
-          >
-            Profile
-          </RouterLink>
+          <Button severity="danger" label="logOut" @click="store.logOut"></Button>
         </li>
       </ul>
     </nav>
@@ -53,5 +39,9 @@
 </template>
 
 <script setup lang="ts">
+import { Button } from 'primevue'
 import { RouterLink, RouterView } from 'vue-router'
+import { userAuthStore } from '@/stores/userAuthStore'
+
+const store = userAuthStore()
 </script>

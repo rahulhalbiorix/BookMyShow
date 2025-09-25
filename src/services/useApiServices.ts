@@ -156,3 +156,9 @@ export const fetchUserListShow = (
 // ╔════════════════════════════╗
 // ║  🟠 Booking API
 // ╚════════════════════════════╝
+
+export const BookSeatsOnShow = (data: any) =>
+  instance.post('/booking/book-seats', data, { headers: { 'Content-Type': 'application/json' } })
+
+export const fetchUserBookingHistory = (page = '', limit = '') =>
+  instance.get('/booking/booking-history', { params: { page, limit } })

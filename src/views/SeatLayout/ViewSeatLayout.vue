@@ -4,6 +4,7 @@
 
     <div class="flex justify-end">
       <Button
+        v-if="store.userRole == 'sub_admin'"
         label="Update Seat Layout"
         severity="info"
         icon="pi pi-plus"
@@ -29,7 +30,8 @@
             v-for="seat in rowObj.seats"
             :key="seat._id"
             class="seat-block flex items-center justify-center rounded-md text-sm font-medium border select-none"
-            :class="seatClass(seat)"
+            :class="[seatClass(seat), isSelected(seat) ? 'ring-2 ring-red-500 scale-105' : '']"
+            @click="handleSeatClick(seat)"
           >
             {{ seat.seatNumber }}
           </div>
@@ -61,6 +63,24 @@
       <div class="flex items-center gap-2">
         <span class="w-4 h-4 rounded-sm bg-red-600"></span> Booked
       </div>
+      <div class="flex items-center gap-2">
+        <span class="w-4 h-4 rounded-sm bg-green-300 border border-green-600"></span> Selected
+      </div>
+    </div>
+
+    <!-- Selected seats + total price -->
+    <div v-if="selectedSeats.length" class="mt-8 text-center">
+      <p class="font-semibold">
+        Selected Seats: {{ selectedSeats.map((s) => s.row + s.seatNumber).join(', ') }}
+      </p>
+
+      <p class="mt-1">Total: ₹ {{ totalPrice }}</p>
+      <Button
+        label="Proceed to Payment"
+        severity="danger"
+        class="mt-3"
+        @click="handleSeatPayment()"
+      />
     </div>
   </div>
 </template>
@@ -68,9 +88,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { fetchseatLayout } from '@/services/useApiServices'
+import { BookSeatsOnShow, fetchseatLayout } from '@/services/useApiServices'
 import { Button } from 'primevue'
 import router from '@/router'
+import { userAuthStore } from '@/stores/userAuthStore'
 
 interface Seat {
   _id: string
@@ -86,6 +107,11 @@ const route = useRoute()
 const screenId = ref<string>((route.params.id as string) || '')
 const seats = ref<Seat[]>([])
 const resMessage = ref('')
+const showId = route.query.showId as string
+const store = userAuthStore()
+
+// selected seats (for customers) -> keep full Seat objects
+const selectedSeats = ref<Seat[]>([])
 
 // fetch seats
 const handleFetchSeatLayout = async (id: string) => {
@@ -102,8 +128,6 @@ const handleFetchSeatLayout = async (id: string) => {
 }
 
 const handleUpdateLayout = () => {
-  alert('update seat layout')
-
   router.push({ name: 'CreateSeatLayout', params: { id: screenId.value } })
 }
 
@@ -125,7 +149,7 @@ const groupedSeats = computed<Record<string, Seat[]>>(() => {
 // rows sorted for display
 const rowsArray = computed(() => {
   const keys = Object.keys(groupedSeats.value)
-  keys.sort((a, b) => b.localeCompare(a)) // O -> A
+  keys.sort((a, b) => b.localeCompare(a)) // Z -> A
   return keys.map((k) => ({ row: k, seats: groupedSeats.value[k] }))
 })
 
@@ -137,6 +161,49 @@ const seatClass = (seat: Seat) => {
   if (seat.type === 'premium') return 'bg-blue-100 border-blue-500'
   if (seat.type === 'vip') return 'bg-yellow-50 border-yellow-500'
   return 'bg-gray-100'
+}
+
+// handle seat click
+const handleSeatClick = (seat: Seat) => {
+  if (store.userRole !== 'customer') return
+  if (seat.isBooked || !seat.isAvailable) return
+
+  const index = selectedSeats.value.findIndex((s) => s._id === seat._id)
+  if (index > -1) {
+    selectedSeats.value.splice(index, 1) // deselect
+  } else {
+    selectedSeats.value.push(seat) // ✅ push full seat object
+  }
+}
+
+const isSelected = (seat: Seat) => {
+  return selectedSeats.value.some((s) => s._id === seat._id)
+}
+
+// total price
+const totalPrice = computed(() => {
+  return selectedSeats.value.reduce((sum, seat) => sum + seat.price, 0)
+})
+
+//handl;e seat book payment
+
+const handleSeatPayment = async () => {
+  try {
+    const Payload = {
+      seatIds: selectedSeats.value.map((item) => item._id),
+      showId: showId,
+    }
+
+    const res = await BookSeatsOnShow(Payload)
+
+    if (res.data.success) {
+      alert(res.data.message)
+      selectedSeats.value = []
+      handleFetchSeatLayout(screenId.value)
+    }
+  } catch (error) {
+    console.log(error)
+  }
 }
 </script>
 

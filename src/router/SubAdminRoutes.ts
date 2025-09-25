@@ -5,7 +5,7 @@ const SubadminRoutes: RouteRecordRaw[] = [
     path: '/subadmin',
     name: 'SubAdmin',
     component: () => import('@/components/SubNavbar.vue'),
-    meta: { requiresAuth: true, role: 'Subadmin' },
+    meta: { requiresAuth: true, role: 'sub_admin' },
     redirect: '/subadmin/theaterList',
     children: [
       {

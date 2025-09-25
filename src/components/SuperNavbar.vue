@@ -62,7 +62,7 @@
               ]"
             >
               <i class="pi pi-sign-out"></i>
-              <span v-if="!collapsed">Logout</span>
+              <span v-if="!collapsed" @click="store.logOut">Logout</span>
             </button>
           </li>
         </ul>
