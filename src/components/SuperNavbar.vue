@@ -60,7 +60,7 @@
                 collapsed ? 'justify-center' : 'justify-start',
                 'flex items-center gap-3 px-3 py-2 rounded bg-red-600 hover:bg-red-700 transition w-full text-left',
               ]"
-              @click="store.logOut"
+              @click="logOutUser"
             >
               <i class="pi pi-sign-out"></i>
               <span v-if="!collapsed">Logout</span>
@@ -85,6 +85,10 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { userAuthStore } from '@/stores/userAuthStore'
+import { handleLogOut } from '@/Composables/useLogOut'
+
+const { logOutUser } = handleLogOut()
+
 const collapsed = ref(false)
 
 const store = userAuthStore()

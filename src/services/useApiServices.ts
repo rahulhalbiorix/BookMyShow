@@ -160,5 +160,5 @@ export const fetchUserListShow = (
 export const BookSeatsOnShow = (data: any) =>
   instance.post('/booking/book-seats', data, { headers: { 'Content-Type': 'application/json' } })
 
-export const fetchUserBookingHistory = (page = '', limit = '') =>
+export const fetchUserBookingHistory = (page = null, limit = null) =>
   instance.get('/booking/booking-history', { params: { page, limit } })

@@ -62,7 +62,7 @@
               ]"
             >
               <i class="pi pi-sign-out"></i>
-              <span v-if="!collapsed" @click="store.logOut">Logout</span>
+              <span v-if="!collapsed" @click="logOutUser">Logout</span>
             </button>
           </li>
         </ul>
@@ -84,6 +84,9 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { userAuthStore } from '@/stores/userAuthStore'
+import { handleLogOut } from '@/Composables/useLogOut'
+
+const { logOutUser } = handleLogOut()
 
 const collapsed = ref(false)
 

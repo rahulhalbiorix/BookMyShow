@@ -27,7 +27,6 @@ export const userAuthStore = defineStore(
     }
 
     function logOut() {
-      console.log('function log out is work....')
       token.value = ''
       userRole.value = ''
       userName.value = ''
