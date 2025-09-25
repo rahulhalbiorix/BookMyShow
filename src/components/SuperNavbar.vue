@@ -60,9 +60,10 @@
                 collapsed ? 'justify-center' : 'justify-start',
                 'flex items-center gap-3 px-3 py-2 rounded bg-red-600 hover:bg-red-700 transition w-full text-left',
               ]"
+              @click="store.logOut"
             >
               <i class="pi pi-sign-out"></i>
-              <span v-if="!collapsed" @click="store.logOut">Logout</span>
+              <span v-if="!collapsed">Logout</span>
             </button>
           </li>
         </ul>
