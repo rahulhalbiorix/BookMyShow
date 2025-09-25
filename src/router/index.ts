@@ -11,6 +11,12 @@ const routes: RouteRecordRaw[] = [
   ...userRoutes,
   ...SubadminRoutes,
   ...SuperAdminRoutes,
+
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('@/views/Page404/PageNotFound.vue'),
+  },
 ]
 
 const router = createRouter({
