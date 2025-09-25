@@ -2,7 +2,6 @@
   <div class="p-6">
     <h1 class="text-3xl font-bold mb-6 text-gray-800">Super Admin Dashboard</h1>
 
-    <!-- Header Section -->
     <div class="flex justify-between items-center mb-6">
       <div class="relative">
         <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
@@ -15,18 +14,18 @@
       </div>
       <button
         class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 shadow"
-        @click="
-          () => {
-            router.push({ name: 'RegisterSubAdmin' })
-          }
-        "
+        @click="() => router.push({ name: 'RegisterSubAdmin' })"
       >
         <i class="pi pi-user-plus"></i> Add Sub Admin
       </button>
     </div>
 
-    <!-- SubAdmins Table -->
-    <div class="overflow-x-auto bg-white shadow-md">
+    <div v-if="loading" class="text-center py-10 text-gray-600">
+      <i class="pi pi-spin pi-spinner text-3xl mb-3"></i>
+      <p>Loading Sub Admins...</p>
+    </div>
+
+    <div v-else class="overflow-x-auto bg-white shadow-md">
       <table class="min-w-full border border-gray-200">
         <thead class="bg-gray-50 text-gray-700">
           <tr>
@@ -85,6 +84,10 @@
           </tr>
         </tbody>
       </table>
+
+      <div v-if="!filteredAdmins.length" class="text-center py-6 text-gray-500">
+        No Sub Admins found.
+      </div>
     </div>
   </div>
 </template>
@@ -107,6 +110,7 @@ interface subAdmins {
 
 const subAdmins = ref<subAdmins[]>([])
 const search = ref('')
+const loading = ref(true)
 
 const filteredAdmins = computed(() =>
   subAdmins.value.filter(
@@ -118,10 +122,13 @@ const filteredAdmins = computed(() =>
 
 const handleSubAdminList = async () => {
   try {
+    loading.value = true
     const res = await fetchListOfSubAdmins()
     if (res.data.success) subAdmins.value = res.data.data.subAdmins
   } catch (error) {
     console.log(error)
+  } finally {
+    loading.value = false
   }
 }
 

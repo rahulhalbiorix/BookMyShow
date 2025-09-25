@@ -38,7 +38,7 @@
               {{ lang.toUpperCase() }}
             </span>
           </div>
-          <div class="mt-3 border-2 bg-amber-200">
+          <div class="mt-3">
             <Button label="BooK Ticket" severity="danger" @click="handleBookTicketBtn"></Button>
           </div>
         </div>

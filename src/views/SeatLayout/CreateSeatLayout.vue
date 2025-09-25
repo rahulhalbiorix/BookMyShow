@@ -1,7 +1,8 @@
 <template>
   <div class="max-w-3xl mx-auto p-6">
+    <!-- Title -->
     <h1 class="text-2xl font-bold mb-6 text-center">Create Seat Layout</h1>
-    <div class="bg-orange-200">Edit Seat LayOut Id : {{ editedSeatLayoutId }}</div>
+
     <!-- Rows -->
     <div class="flex items-center gap-4 mb-4">
       <label for="rows" class="font-semibold w-32">Rows</label>
@@ -56,31 +57,40 @@
 
     <!-- Footer -->
     <div class="flex justify-end gap-2">
-      <Button :label="submitBtn" @click="handleSave" :disabled="!!validationError" />
+      <Button
+        :label="submitBtn"
+        icon="pi pi-check"
+        :loading="isSaving"
+        :disabled="!!validationError || isSaving"
+        @click="handleSave"
+      />
     </div>
   </div>
 
-  <!-- for testing purpose  -->
-  <div>
-    <div class="bg-red-200">Screen id : {{ screenId }}</div>
-    <div class="bg-green-200">Theater Id : {{ theaterId }}</div>
-    <div class="bg-pink-200">Total Seats : {{ TotalSeats }}</div>
+  <!-- Debug Info (Remove in production) -->
+  <div class="mt-4 space-y-2">
+    <div class="bg-red-200">Screen id: {{ screenId }}</div>
+    <div class="bg-green-200">Theater Id: {{ theaterId }}</div>
+    <div class="bg-pink-200">Total Seats: {{ TotalSeats }}</div>
     <div class="bg-yellow-200">Rows × Cols = {{ form.rows * form.cols }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed, watch, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import router from '@/router'
+import { Button, Dropdown, InputNumber } from 'primevue'
 import {
   createSeatLayout,
   fetchScreenDetails,
   fetchseatLayout,
   updateSeatLayout,
 } from '@/services/useApiServices'
-import { Button, Dropdown, InputNumber } from 'primevue'
-import { computed, onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
 
+/* -------------------------------------------------------------------------- */
+/*                                   State                                    */
+/* -------------------------------------------------------------------------- */
 const form = ref({
   rows: 5,
   cols: 10,
@@ -92,54 +102,46 @@ const form = ref({
 })
 
 const seatTypes = ['vip', 'premium', 'regular']
-
 const screenId = ref('')
 const theaterId = ref('')
 const TotalSeats = ref(0)
 const editedSeatLayoutId = ref('')
-
-const submitBtn = computed(() => {
-  if (editedSeatLayoutId.value) {
-    return 'Edit Seat Layout'
-  } else {
-    return 'Add seat Layout'
-  }
-})
-
-watch(editedSeatLayoutId, (newVal) => {
-  if (newVal) {
-    handleFetchSeatLayout(screenId.value)
-  }
-})
-
 const validationError = ref<string | null>(null)
+const isSaving = ref(false)
 
-const route = useRoute()
-screenId.value = route.params.id as string
+/* -------------------------------------------------------------------------- */
+/*                                 Computed                                   */
+/* -------------------------------------------------------------------------- */
+const submitBtn = computed(() =>
+  editedSeatLayoutId.value ? 'Edit Seat Layout' : 'Add Seat Layout',
+)
 
-const addSeat = () => {
-  form.value.seats.push({ row: null, type: null, price: null })
-}
+/* -------------------------------------------------------------------------- */
+/*                                 Watchers                                   */
+/* -------------------------------------------------------------------------- */
+watch(editedSeatLayoutId, (newVal) => {
+  if (newVal) handleFetchSeatLayout(screenId.value)
+})
 
-const removeSeat = (index: number) => {
-  form.value.seats.splice(index, 1)
-}
+/* -------------------------------------------------------------------------- */
+/*                                 Methods                                    */
+/* -------------------------------------------------------------------------- */
+const addSeat = () => form.value.seats.push({ row: null, type: null, price: null })
+const removeSeat = (index: number) => form.value.seats.splice(index, 1)
 
 const validateRowsCols = () => {
   const totalSelected = form.value.rows * form.value.cols
-  if (totalSelected > TotalSeats.value) {
-    validationError.value = `Total selected seats (${totalSelected}) cannot exceed total seats (${TotalSeats.value}).`
-  } else {
-    validationError.value = null
-  }
+  validationError.value =
+    totalSelected > TotalSeats.value
+      ? `Total selected seats (${totalSelected}) cannot exceed total seats (${TotalSeats.value}).`
+      : null
 }
 
 const handleSave = async () => {
   validateRowsCols()
-  if (validationError.value) {
-    return
-  }
+  if (validationError.value) return
 
+  isSaving.value = true
   try {
     const payload = {
       screenId: screenId.value,
@@ -150,67 +152,68 @@ const handleSave = async () => {
       seats: form.value.seats,
     }
 
+    let res
     if (editedSeatLayoutId.value) {
-      alert('Edit mode')
-      const res = await updateSeatLayout(editedSeatLayoutId.value, payload)
-
-      if (res.data.success) {
-        alert(res.data.success)
-        router.push({ name: 'ViewSeatLayout', params: { id: screenId.value } })
-      }
+      res = await updateSeatLayout(editedSeatLayoutId.value, payload)
     } else {
-      const res = await createSeatLayout(payload)
-
-      if (res.data.success) {
-        alert(res.data.success)
-        router.push({ name: 'ViewSeatLayout', params: { id: screenId.value } })
-      }
+      res = await createSeatLayout(payload)
     }
-  } catch (error) {
-    console.log(error)
+
+    if (res.data.success) {
+      router.push({ name: 'AdminSeatLayout', params: { id: screenId.value } })
+    }
+  } catch (err) {
+    console.error(err)
+  } finally {
+    isSaving.value = false
   }
 }
 
 const handleFetchScreenDetails = async (id: string) => {
   try {
     const res = await fetchScreenDetails(id)
-    if (res.data.success) {
-      console.log(res.data)
-      screenId.value = res.data.data._id
-      theaterId.value = res.data.data.theaterId._id
+    if (!res.data.success) return
 
-      editedSeatLayoutId.value = res.data.data.seatLayoutId
+    const data = res.data.data
+    screenId.value = data._id
+    theaterId.value = data.theaterId._id
+    editedSeatLayoutId.value = data.seatLayoutId
 
-      if (!res.data.data.seatLayoutId) {
-        TotalSeats.value = res.data.data.totalSeats
-      }
-    }
-  } catch (error) {
-    console.log(error)
+    // Set TotalSeats correctly
+    TotalSeats.value = data.seatLayoutId
+      ? data.seatLayout.rows * data.seatLayout.cols
+      : data.totalSeats
+  } catch (err) {
+    console.error(err)
   }
 }
 
 const handleFetchSeatLayout = async (id: string) => {
   try {
     const res = await fetchseatLayout(id)
-    if (res.data?.success) {
-      alert(res.data.message)
-      console.log('fetch Seat layout ', res.data)
-      form.value.rows = res.data.data.seatLayout.rows
-      form.value.cols = res.data.data.seatLayout.cols
-      form.value.defaultRegularPrice = res.data.data.seatLayout.defaultRegularPrice
+    if (!res.data?.success) return
 
-      form.value.seats = Object.values(res.data.data.seatTypes).map((seatType: any) => ({
-        row: seatType.rowCount,
-        price: seatType.price,
-        type: seatType.type,
-      }))
-    }
-  } catch (error) {
-    console.log(error)
+    const seatLayout = res.data.data.seatLayout
+    form.value.rows = seatLayout.rows
+    form.value.cols = seatLayout.cols
+    form.value.defaultRegularPrice = seatLayout.defaultRegularPrice
+    TotalSeats.value = seatLayout.rows * seatLayout.cols
+
+    form.value.seats = Object.values(res.data.data.seatTypes).map((seatType: any) => ({
+      row: seatType.rowCount,
+      price: seatType.price,
+      type: seatType.type,
+    }))
+  } catch (err) {
+    console.error(err)
   }
 }
-onMounted(() => {
-  handleFetchScreenDetails(screenId.value)
-})
+
+/* -------------------------------------------------------------------------- */
+/*                                 Lifecycle                                  */
+/* -------------------------------------------------------------------------- */
+const route = useRoute()
+screenId.value = route.params.id as string
+
+onMounted(() => handleFetchScreenDetails(screenId.value))
 </script>

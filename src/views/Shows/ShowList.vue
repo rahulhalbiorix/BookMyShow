@@ -28,8 +28,13 @@
       </div>
     </div>
 
+    <!-- Loader -->
+    <div v-if="loading" class="flex justify-center items-center py-12">
+      <ProgressSpinner />
+    </div>
+
     <!-- Shows List -->
-    <div v-if="shows.length > 0" class="space-y-6">
+    <div v-else-if="shows.length > 0" class="space-y-6">
       <div
         v-for="show in shows"
         :key="show._id"
@@ -46,7 +51,6 @@
 
         <!-- Details -->
         <div class="flex-1 p-4 flex flex-col justify-between">
-          <div class="bg-red-200">{{ show.movieId._id }}</div>
           <div>
             <!-- Show Status Badge -->
             <div class="mb-2 flex justify-self-end">
@@ -119,6 +123,7 @@
       </div>
     </div>
 
+    <!-- Empty State -->
     <div v-else class="text-center text-gray-500 mt-12 text-lg">
       No shows available for this date.
     </div>
@@ -128,11 +133,12 @@
 <script setup>
 import router from '@/router'
 import { deleteShows, showList } from '@/services/useApiServices'
-import { Button } from 'primevue'
+import { Button, ProgressSpinner } from 'primevue'
 
 import { ref, watch } from 'vue'
 
 const shows = ref([])
+const loading = ref(false)
 
 // Generate next 7 days
 const next7Days = []
@@ -153,12 +159,15 @@ const selectedDate = ref(next7Days[0].fullDate)
 // Fetch shows
 const handleFetchShow = async (dateTime) => {
   try {
+    loading.value = true
     const res = await showList('', '', '', dateTime)
     if (res.data.success) {
       shows.value = res.data.data
     }
   } catch (error) {
     console.error(error)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -185,14 +194,16 @@ const handleEditShow = (id) => {
 }
 const handleDeleteShow = async (id) => {
   try {
+    loading.value = true
     const res = await deleteShows(id)
-
     if (res.data.success) {
       alert(res.data.message)
       handleFetchShow(selectedDate.value)
     }
   } catch (error) {
     console.log(error)
+  } finally {
+    loading.value = false
   }
 }
 </script>

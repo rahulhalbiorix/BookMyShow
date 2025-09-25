@@ -37,20 +37,7 @@
           {{ lang }}
         </span>
       </div>
-      <div class="bg-green-200">
-        {{ movieDetailes._id }}
-      </div>
     </div>
-
-    <!-- Action Button -->
-    <!-- <div class="p-4 border-t flex justify-center">
-      <Button
-        label="Book Tickets"
-        icon="pi pi-ticket"
-        class="px-6 py-2 font-semibold rounded-full shadow-md"
-        severity="danger"
-      />
-    </div> -->
   </div>
 </template>
 

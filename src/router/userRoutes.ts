@@ -24,9 +24,9 @@ const userRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/Shows/AllMovieShowList.vue'),
       },
       {
-        path: '/seat-layout/:id',
-        name: 'ViewSeatLayout',
-        component: () => import('@/views/SeatLayout/ViewSeatLayout.vue'),
+        path: '/seat-layout/user/:id',
+        name: 'UserSeatLayout',
+        component: () => import('@/views/SeatLayout/UserSeatLayout.vue'),
       },
 
       {

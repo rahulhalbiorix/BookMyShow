@@ -46,8 +46,6 @@
         </div>
       </template>
     </Card>
-
-    <div class="bg-red-200">SeatLayoutId : {{ SeatLayOutId }}</div>
   </div>
 </template>
 
@@ -81,13 +79,12 @@ const handleFetchScreenDetails = async (id: string) => {
 }
 
 const handleViewSeatLayout = () => {
-  router.push({ name: 'ViewSeatLayout', params: { id: ScreenId.value } })
+  router.push({ name: 'AdminSeatLayout', params: { id: ScreenId.value } })
 
   alert('start to view  seat layout....')
 }
 
 const handleCreateSeatLayout = () => {
-  alert('start to create  seat layout....')
   router.push({ name: 'CreateSeatLayout', params: { id: ScreenId.value } })
 }
 

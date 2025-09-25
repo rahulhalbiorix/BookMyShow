@@ -1,8 +1,13 @@
 <template>
   <div class="max-w-screen-lg mx-auto p-6">
+    <!-- Loader -->
+    <div v-if="loading" class="flex justify-center items-center py-12">
+      <i class="pi pi-spin pi-spinner text-4xl text-gray-600"></i>
+    </div>
+
     <!-- If Theater Data Exists -->
     <Card
-      v-if="TheaterData"
+      v-else-if="TheaterData"
       class="shadow-3 border-round-2xl overflow-hidden hover:shadow-6 transition-all duration-300"
     >
       <!-- Card Header (Theater Image + Featured Badge) -->
@@ -57,27 +62,32 @@
             <i class="pi pi-id-card text-primary"></i>
             Owner Details
           </h3>
+
           <div class="flex flex-column gap-3">
+            <!-- Owner Name -->
             <div class="flex align-items-center gap-2">
               <Avatar icon="pi pi-user" class="mr-2 bg-primary text-white" shape="circle" />
               <span class="font-medium">{{ TheaterData.ownerId.name }}</span>
             </div>
+
+            <!-- Owner Email -->
             <div class="flex align-items-center gap-2">
               <i class="pi pi-envelope text-primary"></i>
               <span>{{ TheaterData.ownerId.email }}</span>
             </div>
+
+            <!-- Owner Mobile -->
             <div class="flex align-items-center gap-2">
               <i class="pi pi-phone text-primary"></i>
               <span>{{ TheaterData.ownerId.mobile }}</span>
             </div>
+
+            <!-- Owner Role -->
             <Tag
               :value="TheaterData.ownerId.role"
               severity="info"
               class="w-max px-3 py-1 font-medium text-sm"
             />
-          </div>
-          <div class="bg-yellow-300">
-            {{ TheaterData._id }}
           </div>
         </div>
       </template>
@@ -111,19 +121,25 @@
 </template>
 
 <script lang="ts" setup>
+/* ---------------- Imports ---------------- */
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import router from '@/router'
 import { fetchtheaterdetailes } from '@/services/useApiServices'
 import { Avatar, Button, Card, Divider, Tag } from 'primevue'
-import router from '@/router'
 
+/* ---------------- State ---------------- */
 const TheaterId = ref<string>('')
 const TheaterData = ref<any>(null)
+const loading = ref(false)
 
+/* ---------------- Router ---------------- */
 const route = useRoute()
 TheaterId.value = route.params.id as string
 
+/* ---------------- API Call ---------------- */
 const handleFetchTheaterDetailesById = async () => {
+  loading.value = true
   try {
     const res = await fetchtheaterdetailes(TheaterId.value)
 
@@ -135,13 +151,17 @@ const handleFetchTheaterDetailesById = async () => {
   } catch (error) {
     console.error('Error fetching theater details:', error)
     TheaterData.value = null
+  } finally {
+    loading.value = false
   }
 }
 
+/* ---------------- Navigation ---------------- */
 const viewScreenList = (id: string) => {
   router.push({ name: 'ScreenList', params: { id } })
 }
 
+/* ---------------- Lifecycle ---------------- */
 onMounted(() => {
   handleFetchTheaterDetailesById()
 })

@@ -17,18 +17,18 @@
       </template>
     </Toolbar>
 
-    <div class="bg-red-200">
-      {{ EditedScreenId }}
+    <!-- Loading Spinner while fetching -->
+    <div v-if="isListLoading" class="flex justify-center py-20">
+      <i class="pi pi-spin pi-spinner text-4xl text-gray-500"></i>
     </div>
 
     <!-- Screen Cards Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <Card
         v-for="screen in screens"
         :key="screen._id"
         class="shadow-lg rounded-xl flex flex-col h-full"
       >
-        <!-- Card Title -->
         <template #title>
           <div class="flex justify-between items-center">
             <span class="font-bold text-lg">{{ screen.name }}</span>
@@ -40,15 +40,10 @@
           </div>
         </template>
 
-        <!-- Card Subtitle -->
         <template #subtitle>
           <span class="text-gray-500">Total Seats: {{ screen.totalSeats }}</span>
-          <div class="bg-blue-100">
-            {{ screen._id }}
-          </div>
         </template>
 
-        <!-- Card Footer with Actions -->
         <template #footer>
           <div class="flex flex-wrap">
             <Button
@@ -59,7 +54,7 @@
               size="small"
               class="flex-1 min-w-[100px]"
               @click="handleScreenView(screen._id)"
-            ></Button>
+            />
           </div>
           <div class="flex flex-wrap justify-between gap-2 mt-2">
             <Button
@@ -94,36 +89,51 @@
       </Card>
     </div>
 
-    <!-- ----dialog box for add screen -->
-
+    <!-- ----dialog box for add/edit screen -->
     <Dialog
       v-model:visible="visible"
       modal
-      header="Add New Screen"
+      :header="EditedScreenId ? 'Edit Screen' : 'Add New Screen'"
       :style="{ width: '400px' }"
       :closable="true"
       @hide="resetForm"
     >
       <div class="space-y-4">
+        <!-- Screen Name -->
         <div>
           <label class="block text-sm font-medium mb-1">Screen Name</label>
-          <InputText v-model="newScreen.name" placeholder="Enter screen name" class="w-full" />
-          {{ newScreen.name }}
+          <InputText
+            v-model="newScreen.name"
+            placeholder="Enter screen name"
+            class="w-full"
+            :class="{ 'p-invalid': errors.name }"
+          />
+          <small v-if="errors.name" class="p-error">{{ errors.name }}</small>
         </div>
+
+        <!-- Total Seats -->
         <div>
           <label class="block text-sm font-medium mb-1">Total Seats</label>
           <InputNumber
             v-model="newScreen.totalSeats"
             placeholder="Enter total seats"
             class="w-full"
+            :class="{ 'p-invalid': errors.totalSeats }"
           />
-          {{ newScreen.totalSeats }}
+          <small v-if="errors.totalSeats" class="p-error">{{ errors.totalSeats }}</small>
         </div>
       </div>
 
       <template #footer>
         <Button label="Cancel" icon="pi pi-times" text @click="resetForm" />
-        <Button label="Save" icon="pi pi-check" severity="success" @click="handleSaveScreen" />
+        <Button
+          :label="EditedScreenId ? 'Update' : 'Save'"
+          icon="pi pi-check"
+          severity="success"
+          :loading="isSaving"
+          :disabled="isSaving"
+          @click="handleSaveScreen"
+        />
       </template>
     </Dialog>
   </div>
@@ -134,7 +144,6 @@ import { onMounted, ref } from 'vue'
 import {
   addScreen,
   deleteScreen,
-  fetchScreenDetailes,
   fetchScreenList,
   toggleScreen,
   updateScreen,
@@ -155,7 +164,7 @@ import {
 } from 'primevue'
 import router from '@/router'
 
-interface screens {
+interface Screen {
   _id: string
   name: string
   totalSeats: number
@@ -164,11 +173,16 @@ interface screens {
 
 const visible = ref(false)
 const newScreen = ref({ name: '', totalSeats: 0 })
-
 const TheaterId = ref('')
 const EditedScreenId = ref('')
+const screens = ref<Screen[]>([])
 
-const screens = ref<screens[]>([])
+// Validation errors
+const errors = ref<{ name?: string; totalSeats?: string }>({})
+
+// Loading states
+const isSaving = ref(false)
+const isListLoading = ref(false)
 
 const route = useRoute()
 TheaterId.value = route.params.id as string
@@ -176,78 +190,75 @@ TheaterId.value = route.params.id as string
 const toast = useToast()
 const confirm = useConfirm()
 
+const validateForm = () => {
+  errors.value = {}
+  if (!newScreen.value.name) {
+    errors.value.name = 'Screen name is required'
+  }
+  if (!newScreen.value.totalSeats || newScreen.value.totalSeats <= 0) {
+    errors.value.totalSeats = 'Total seats must be greater than 0'
+  }
+  return Object.keys(errors.value).length === 0
+}
+
 const handleAddScreen = () => {
-  console.log('add btn clicked....')
   visible.value = true
 }
 
 const handleSaveScreen = async () => {
-  if (!newScreen.value.name || !newScreen.value.totalSeats) {
-    toast.add({
-      severity: 'warn',
-      summary: 'Validation',
-      detail: 'Please fill all fields',
-      life: 3000,
-    })
-    return
-  }
+  if (!validateForm()) return
 
+  isSaving.value = true
   try {
     if (EditedScreenId.value) {
-      alert('Edit Mode')
-
       const updatePayload = {
         name: newScreen.value.name,
         totalSeats: newScreen.value.totalSeats,
       }
-
       const res = await updateScreen(EditedScreenId.value, updatePayload)
-
       if (res.data.success) {
-        alert(res.data.message)
+        toast.add({
+          severity: 'success',
+          summary: 'Updated',
+          detail: res.data.message,
+          life: 3000,
+        })
         EditedScreenId.value = ''
         handleFetchscreenList()
       }
     } else {
-      alert('Fresh data.....')
       const addPayload = {
         name: newScreen.value.name,
         totalSeats: newScreen.value.totalSeats,
         theaterId: TheaterId.value,
       }
-
       const res = await addScreen(addPayload)
-
       if (res.data.success) {
-        alert(res.data.message)
+        toast.add({
+          severity: 'success',
+          summary: 'Added',
+          detail: res.data.message,
+          life: 3000,
+        })
         handleFetchscreenList()
       }
     }
+    resetForm()
   } catch (error) {
     console.log(error)
+  } finally {
+    isSaving.value = false
   }
-
-  toast.add({
-    severity: 'success',
-    summary: 'Added',
-    detail: 'Screen added successfully',
-    life: 3000,
-  })
-
-  // Reset form & close dialog
-  resetForm()
 }
 
 const resetForm = () => {
-  alert('reset funct work...')
   newScreen.value = { name: '', totalSeats: 0 }
   visible.value = false
   EditedScreenId.value = ''
-  visible.value = false
+  errors.value = {}
 }
 
-const handleEditScreen = (screen: any) => {
-  // toast.add({ severity: 'warn', summary: 'Edit Screen', detail: screen.name, life: 3000 })
+const handleEditScreen = (screen: Screen) => {
   EditedScreenId.value = screen._id
   newScreen.value.name = screen.name
   newScreen.value.totalSeats = screen.totalSeats
@@ -261,10 +272,7 @@ const handleDeleteScreen = (id: string) => {
     icon: 'pi pi-exclamation-triangle',
     accept: async () => {
       try {
-        console.log(id)
-
         const res = await deleteScreen(id)
-
         if (res.data.success) {
           toast.add({
             severity: 'error',
@@ -284,7 +292,6 @@ const handleDeleteScreen = (id: string) => {
 const handleToggleActive = async (id: string) => {
   try {
     const res = await toggleScreen(id)
-
     if (res.data.success) {
       toast.add({
         severity: res.data.isActive ? 'success' : 'secondary',
@@ -300,15 +307,16 @@ const handleToggleActive = async (id: string) => {
 }
 
 const handleFetchscreenList = async () => {
+  isListLoading.value = true
   try {
     const res = await fetchScreenList(TheaterId.value)
-
     if (res.data.success) {
-      alert(res.data.message)
       screens.value = res.data.data.screens
     }
   } catch (error) {
     console.log(error)
+  } finally {
+    isListLoading.value = false
   }
 }
 
@@ -320,3 +328,9 @@ onMounted(() => {
   handleFetchscreenList()
 })
 </script>
+
+<style>
+.p-error {
+  color: red;
+}
+</style>

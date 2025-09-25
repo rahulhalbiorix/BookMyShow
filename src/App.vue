@@ -4,10 +4,4 @@
   </main>
 </template>
 
-<script setup lang="ts">
-import Navbar from './components/Navbar.vue'
-
-import { userAuthStore } from './stores/userAuthStore'
-
-const store = userAuthStore()
-</script>
+<script setup lang="ts"></script>

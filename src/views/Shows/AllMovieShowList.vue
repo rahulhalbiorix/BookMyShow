@@ -209,7 +209,7 @@ onMounted(() => {
 const bookShow = (show: Show) => {
   console.log(show)
   router.push({
-    name: 'ViewSeatLayout',
+    name: 'UserSeatLayout',
     params: { id: show.screenId._id },
     query: { showId: show._id },
   })

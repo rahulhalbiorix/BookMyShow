@@ -1,22 +1,10 @@
 <template>
   <div class="max-w-5xl mx-auto p-6">
-    <h1 class="text-2xl font-bold mb-6 text-center">Seat Layout</h1>
-
-    <div class="flex justify-end">
-      <Button
-        v-if="store.userRole == 'sub_admin'"
-        label="Update Seat Layout"
-        severity="info"
-        icon="pi pi-plus"
-        class="mb-4"
-        @click="handleUpdateLayout"
-      />
-    </div>
+    <h1 class="text-2xl font-bold mb-6 text-center">Book Seats</h1>
 
     <!-- Rows -->
     <div v-if="rowsArray.length" class="border p-4 rounded-lg shadow">
       <div v-for="rowObj in rowsArray" :key="rowObj.row" class="mb-6">
-        <!-- Row header -->
         <div class="flex justify-between items-center mb-2 px-4">
           <h2 class="font-semibold text-lg">Row {{ rowObj.row }}</h2>
           <span class="text-sm text-gray-600">
@@ -24,7 +12,6 @@
           </span>
         </div>
 
-        <!-- Seats -->
         <div class="grid grid-cols-10 gap-2 justify-center px-4">
           <div
             v-for="seat in rowObj.seats"
@@ -39,10 +26,7 @@
       </div>
     </div>
 
-    <!-- Error -->
-    <div v-else class="text-center text-red-500 font-semibold">
-      {{ resMessage }}
-    </div>
+    <div v-else class="text-center text-red-500 font-semibold">{{ resMessage }}</div>
 
     <!-- Screen indicator -->
     <div class="mt-8 flex justify-center">
@@ -73,7 +57,6 @@
       <p class="font-semibold">
         Selected Seats: {{ selectedSeats.map((s) => s.row + s.seatNumber).join(', ') }}
       </p>
-
       <p class="mt-1">Total: ₹ {{ totalPrice }}</p>
       <Button
         label="Proceed to Payment"
@@ -90,8 +73,6 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { BookSeatsOnShow, fetchseatLayout } from '@/services/useApiServices'
 import { Button } from 'primevue'
-import router from '@/router'
-import { userAuthStore } from '@/stores/userAuthStore'
 
 interface Seat {
   _id: string
@@ -108,12 +89,8 @@ const screenId = ref<string>((route.params.id as string) || '')
 const seats = ref<Seat[]>([])
 const resMessage = ref('')
 const showId = route.query.showId as string
-const store = userAuthStore()
-
-// selected seats (for customers) -> keep full Seat objects
 const selectedSeats = ref<Seat[]>([])
 
-// fetch seats
 const handleFetchSeatLayout = async (id: string) => {
   try {
     const res = await fetchseatLayout(id)
@@ -121,21 +98,14 @@ const handleFetchSeatLayout = async (id: string) => {
       seats.value = res.data.data.seatLayout.seats
     }
   } catch (error: any) {
-    if (error.response) {
-      resMessage.value = error.response.data.message
-    }
+    resMessage.value = error.response?.data?.message || 'Error fetching seat layout'
   }
-}
-
-const handleUpdateLayout = () => {
-  router.push({ name: 'CreateSeatLayout', params: { id: screenId.value } })
 }
 
 onMounted(() => {
   if (screenId.value) handleFetchSeatLayout(screenId.value)
 })
 
-// group seats
 const groupedSeats = computed<Record<string, Seat[]>>(() => {
   const acc: Record<string, Seat[]> = {}
   seats.value.forEach((s) => {
@@ -146,14 +116,12 @@ const groupedSeats = computed<Record<string, Seat[]>>(() => {
   return acc
 })
 
-// rows sorted for display
 const rowsArray = computed(() => {
   const keys = Object.keys(groupedSeats.value)
-  keys.sort((a, b) => b.localeCompare(a)) // Z -> A
+  keys.sort((a, b) => b.localeCompare(a))
   return keys.map((k) => ({ row: k, seats: groupedSeats.value[k] }))
 })
 
-// seat class styling
 const seatClass = (seat: Seat) => {
   if (seat.isBooked) return 'bg-red-600 text-white cursor-not-allowed border-red-600'
   if (!seat.isAvailable) return 'bg-gray-200 text-gray-500 cursor-not-allowed border-gray-300'
@@ -163,29 +131,19 @@ const seatClass = (seat: Seat) => {
   return 'bg-gray-100'
 }
 
-// handle seat click
 const handleSeatClick = (seat: Seat) => {
-  if (store.userRole !== 'customer') return
   if (seat.isBooked || !seat.isAvailable) return
-
   const index = selectedSeats.value.findIndex((s) => s._id === seat._id)
   if (index > -1) {
-    selectedSeats.value.splice(index, 1) // deselect
+    selectedSeats.value.splice(index, 1)
   } else {
-    selectedSeats.value.push(seat) // ✅ push full seat object
+    selectedSeats.value.push(seat)
   }
 }
 
-const isSelected = (seat: Seat) => {
-  return selectedSeats.value.some((s) => s._id === seat._id)
-}
+const isSelected = (seat: Seat) => selectedSeats.value.some((s) => s._id === seat._id)
 
-// total price
-const totalPrice = computed(() => {
-  return selectedSeats.value.reduce((sum, seat) => sum + seat.price, 0)
-})
-
-//handl;e seat book payment
+const totalPrice = computed(() => selectedSeats.value.reduce((sum, seat) => sum + seat.price, 0))
 
 const handleSeatPayment = async () => {
   try {
@@ -193,9 +151,7 @@ const handleSeatPayment = async () => {
       seatIds: selectedSeats.value.map((item) => item._id),
       showId: showId,
     }
-
     const res = await BookSeatsOnShow(Payload)
-
     if (res.data.success) {
       alert(res.data.message)
       selectedSeats.value = []
@@ -206,16 +162,3 @@ const handleSeatPayment = async () => {
   }
 }
 </script>
-
-<style scoped>
-.seat-block {
-  height: 40px;
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease;
-}
-.seat-block:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-}
-</style>

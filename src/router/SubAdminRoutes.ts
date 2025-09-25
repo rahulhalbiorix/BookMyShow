@@ -34,9 +34,9 @@ const SubadminRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/Shows/AddEditShow.vue'),
       },
       {
-        path: '/seat-layout/:id',
-        name: 'ViewSeatLayout',
-        component: () => import('@/views/SeatLayout/ViewSeatLayout.vue'),
+        path: '/seat-layout/admin/:id',
+        name: 'AdminSeatLayout',
+        component: () => import('@/views/SeatLayout/AdminSeatLayout.vue'),
       },
       {
         path: '/seat-layout/create/:id',
